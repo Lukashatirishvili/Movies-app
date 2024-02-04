@@ -56,12 +56,14 @@ const average = (arr) =>
 const KEY = "33c39069";
 
 export default function App() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState("Inception");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
+  console.log(selectedId);
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -286,6 +288,8 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
+  console.log(movie);
+
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
@@ -317,6 +321,13 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     },
     [selectedId]
   );
+
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    return () => (document.title = "usePopcorn");
+  }, [title]);
 
   return (
     <div className="details">
