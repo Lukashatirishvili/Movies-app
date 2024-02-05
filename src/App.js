@@ -56,14 +56,12 @@ const average = (arr) =>
 const KEY = "33c39069";
 
 export default function App() {
-  const [query, setQuery] = useState("Inception");
+  const [query, setQuery] = useState("");
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-
-  console.log(selectedId);
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -82,12 +80,17 @@ export default function App() {
   }
 
   useEffect(() => {
-    setError("");
-    setIsLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     async function fetchMovies() {
       try {
+        setError("");
+        setIsLoading(true);
+
         const res = await fetch(
-          `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+          `https://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`,
+          { signal }
         );
 
         if (!res.ok) {
@@ -100,7 +103,8 @@ export default function App() {
         setMovies(data.Search);
       } catch (err) {
         console.error(err.message);
-        setError(err.message);
+
+        if (err.name !== "AbortError") setError(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -111,6 +115,10 @@ export default function App() {
       }
     }
     fetchMovies();
+
+    return function () {
+      controller.abort();
+    };
   }, [query]);
 
   return (
