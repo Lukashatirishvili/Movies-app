@@ -102,9 +102,11 @@ export default function App() {
         if (data.Response === "False") throw new Error("Movie not found");
         setMovies(data.Search);
       } catch (err) {
-        console.error(err.message);
+        console.log(err.message);
 
-        if (err.name !== "AbortError") setError(err.message);
+        if (err.name !== "AbortError") {
+          setError(err.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -114,6 +116,7 @@ export default function App() {
         return;
       }
     }
+    handleCloseMovie();
     fetchMovies();
 
     return function () {
@@ -296,8 +299,6 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     Genre: genre,
   } = movie;
 
-  console.log(movie);
-
   function handleAdd() {
     const newWatchedMovie = {
       imdbID: selectedId,
@@ -312,6 +313,20 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  useEffect(() => {
+    function callBack(e) {
+      if (e.code === "Escape") {
+        onCloseMovie();
+      }
+    }
+
+    document.addEventListener("keydown", callBack);
+
+    return function () {
+      document.removeEventListener("keydown", callBack);
+    };
+  }, [onCloseMovie]);
 
   useEffect(
     function () {
