@@ -32,8 +32,6 @@ export function useMovies(query) {
         if (data.Response === "False") throw new Error("Movie not found");
         setMovies(data.Search);
       } catch (err) {
-        console.log(err.message);
-
         if (err.name !== "AbortError") {
           setError(err.message);
         }
