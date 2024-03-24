@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import Loader from "./Loader";
 import StarRating from "./StarRating";
 import { useMovieContext } from "../context/MoviesContext";
@@ -6,20 +6,18 @@ import { useMovieContext } from "../context/MoviesContext";
 const KEY = "33c39069";
 
 export default function MovieDetails() {
-  const { movie, watched, selectedID, isLoading, userRating, dispatch } =
-    useMovieContext();
-
-  const countRef = useRef(0);
-
-  useEffect(() => {
-    if (userRating) countRef.current = countRef.current + 1;
-  }, [userRating]);
+  const {
+    movie,
+    watched,
+    selectedID,
+    isLoading,
+    userRating,
+    dispatch,
+    handleAddToList,
+    closeSelectedMovie,
+  } = useMovieContext();
 
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedID);
-
-  const watchedUserRating = watched.find(
-    (movie) => movie.imdbID === selectedID
-  )?.userRating;
 
   useEffect(() => {
     async function getSelectedMovie() {
@@ -43,19 +41,6 @@ export default function MovieDetails() {
     getSelectedMovie();
   }, [selectedID, dispatch]);
 
-  const {
-    Title: title,
-    Year: year,
-    Poster: poster,
-    Runtime: runtime,
-    imdbRating,
-    Plot: plot,
-    Released: released,
-    Actors: actors,
-    Director: director,
-    Genre: genre,
-  } = movie;
-
   return (
     <div className="details">
       {isLoading ? (
@@ -63,46 +48,50 @@ export default function MovieDetails() {
       ) : (
         <>
           <header>
-            <button className="btn-back">&larr;</button>
-            <img src={poster} alt={`poster of ${movie} movie`} />
+            <button onClick={closeSelectedMovie} className="btn-back">
+              &larr;
+            </button>
+            <img src={movie.Poster} alt={`poster of ${movie} movie`} />
             <div className="details-overview">
-              <h2>{title}</h2>
+              <h2>{movie.Title}</h2>
               <p>
-                {released} &bull; {runtime}
+                {movie.Released} &bull; {movie.Runtime}
               </p>
-              <p>{genre}</p>
+              <p>{movie.Genre}</p>
               <p>
                 <span>⭐</span>
-                {imdbRating} IMDB rating
+                {movie.imdbRating} IMDB rating
               </p>
             </div>
           </header>
 
           <section>
             <div className="rating">
-              <StarRating />
-              {userRating > 0 && (
+              {isWatched ? (
+                <p>You already rated this movie</p>
+              ) : (
                 <>
-                  <button className="btn-add">+ Add to list</button>
-                </>
-              )}
-              {/* {!isWatched ? (
-                <>
-                  <StarRating maxRating={10} size={24} />
-                  {
+                  <StarRating />
+                  {userRating > 0 && (
+                    <>
+                      <button
+                        onClick={() => {
+                          handleAddToList();
+                        }}
+                        className="btn-add"
+                      >
+                        + Add to list
+                      </button>
+                    </>
                   )}
                 </>
-              ) : (
-                <p>
-                  You rated with movie {watchedUserRating} <span>⭐</span>
-                </p>
-              )} */}
+              )}
             </div>
             <p>
-              <em>{plot}</em>
+              <em>{movie.Plot}</em>
             </p>
-            <p>Starring {actors}</p>
-            <p>Directed by {director}</p>
+            <p>Starring {movie.Actors}</p>
+            <p>Directed by {movie.Director}</p>
           </section>
         </>
       )}

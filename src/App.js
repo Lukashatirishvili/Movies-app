@@ -1,6 +1,3 @@
-import { useLocalStorageState } from "./customHooks/useLocalStorageState";
-
-// context
 import { useMovieContext } from "./context/MoviesContext";
 
 // Components
@@ -18,21 +15,7 @@ import MovieDetails from "./components/MovieDetails";
 import Main from "./components/Main";
 
 export default function App() {
-  const [watched, setWatched] = useLocalStorageState([], "watched"); // Custom Hook
-
   const { isLoading, error, selectedID } = useMovieContext();
-
-  // function handleCloseMovie() {
-  //   setSelectedId(null);
-  // }
-
-  function handleAddWatched(movie) {
-    setWatched((watched) => [...watched, movie]);
-  }
-
-  function handleDelete(id) {
-    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
-  }
 
   return (
     <>
@@ -51,16 +34,11 @@ export default function App() {
 
         <Box>
           {selectedID ? (
-            <MovieDetails
-            // onCloseMovie={handleCloseMovie}
-            // selectedId={selectedId}
-            // onAddWatched={handleAddWatched}
-            // watched={watched}
-            />
+            <MovieDetails />
           ) : (
             <>
-              <WatchedSummary watched={watched} />
-              <WatchedMovieList watched={watched} onDelete={handleDelete} />
+              <WatchedSummary />
+              <WatchedMovieList />
             </>
           )}
         </Box>

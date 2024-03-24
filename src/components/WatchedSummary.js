@@ -1,10 +1,17 @@
+import { useMovieContext } from "../context/MoviesContext";
+
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-export default function WatchedSummary({ watched }) {
+export default function WatchedSummary() {
+  const { watched } = useMovieContext();
+
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
-  const avgRuntime = average(watched.map((movie) => movie.runtime));
+  const avgRuntime = average(
+    watched.map((movie) => movie.Runtime.split(" ")[0])
+  );
+
   return (
     <div className="summary">
       <h2>Movies you watched</h2>

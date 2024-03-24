@@ -1,8 +1,11 @@
-export default function WatchedMovie({ movie, onDelete }) {
+import { useMovieContext } from "../context/MoviesContext";
+
+export default function WatchedMovie({ movie }) {
+  const { handleDeleteMovie } = useMovieContext();
   return (
     <li key={movie.imdbID}>
-      <img src={movie.poster} alt={`${movie.title} poster`} />
-      <h3>{movie.title}</h3>
+      <img src={movie.Poster} alt={`${movie.Title} poster`} />
+      <h3>{movie.Title}</h3>
       <div>
         <p>
           <span>⭐️</span>
@@ -14,10 +17,13 @@ export default function WatchedMovie({ movie, onDelete }) {
         </p>
         <p>
           <span>⏳</span>
-          <span>{movie.runtime} min</span>
+          <span>{movie.Runtime}</span>
         </p>
 
-        <button className="btn-delete" onClick={() => onDelete(movie.imdbID)}>
+        <button
+          onClick={() => handleDeleteMovie(movie.imdbID)}
+          className="btn-delete"
+        >
           X
         </button>
       </div>
