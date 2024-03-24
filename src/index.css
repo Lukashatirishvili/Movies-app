@@ -352,3 +352,27 @@ SPACING SYSTEM (px)
 FONT SIZE SYSTEM (px)
 10 / 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 44 /52 / 62 / 74 / 86 / 98
 */
+
+.ratingSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ratingSection .message {
+  font-size: 1.5rem;
+}
+
+.starSection {
+  display: flex;
+  gap: 4px;
+}
+
+.star {
+  cursor: pointer;
+}
+
+.star ion-icon {
+  width: 25px;
+  height: 25px;
+}

@@ -1,13 +1,15 @@
 import { useRef } from "react";
-import { useKey } from "../useKey";
+import { useKey } from "../customHooks/useKey";
+import { useMovieContext } from "../context/MoviesContext";
 
-export default function Search({ query, setQuery }) {
+export default function Search() {
   const inputEl = useRef(null);
+
+  const { handleInputChange, query } = useMovieContext();
 
   useKey("Enter", () => {
     if (document.activeElement === inputEl.current) return;
     inputEl.current.focus();
-    setQuery("");
   });
 
   return (
@@ -16,7 +18,7 @@ export default function Search({ query, setQuery }) {
       type="text"
       placeholder="Search movies..."
       value={query}
-      onChange={(e) => setQuery(e.target.value)}
+      onChange={handleInputChange}
       ref={inputEl}
     />
   );

@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { useMovies } from "./useMovies";
-import { useLocalStorageState } from "./useLocalStorageState";
+import { useLocalStorageState } from "./customHooks/useLocalStorageState";
+
+// context
+import { useMovieContext } from "./context/MoviesContext";
 
 // Components
 import NavBar from "./components/NavBar";
@@ -17,19 +18,13 @@ import MovieDetails from "./components/MovieDetails";
 import Main from "./components/Main";
 
 export default function App() {
-  const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState(null);
   const [watched, setWatched] = useLocalStorageState([], "watched"); // Custom Hook
 
-  const { movies, isLoading, error } = useMovies(query); // Custom Hook
+  const { isLoading, error, selectedID } = useMovieContext();
 
-  function handleSelectMovie(id) {
-    setSelectedId((selectedId) => (id === selectedId ? null : id));
-  }
-
-  function handleCloseMovie() {
-    setSelectedId(null);
-  }
+  // function handleCloseMovie() {
+  //   setSelectedId(null);
+  // }
 
   function handleAddWatched(movie) {
     setWatched((watched) => [...watched, movie]);
@@ -43,26 +38,24 @@ export default function App() {
     <>
       <NavBar>
         <Logo />
-        <Search query={query} setQuery={setQuery} />
-        <NumResults movies={movies} />
+        <Search />
+        <NumResults />
       </NavBar>
       <Main>
         <Box>
           {isLoading && <Loader />}
-          {!isLoading && !error && (
-            <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
-          )}
+          {!isLoading && !error && <MovieList />}
 
-          {error && <ErrorMessage message={error} />}
+          {error && <ErrorMessage />}
         </Box>
 
         <Box>
-          {selectedId ? (
+          {selectedID ? (
             <MovieDetails
-              onCloseMovie={handleCloseMovie}
-              selectedId={selectedId}
-              onAddWatched={handleAddWatched}
-              watched={watched}
+            // onCloseMovie={handleCloseMovie}
+            // selectedId={selectedId}
+            // onAddWatched={handleAddWatched}
+            // watched={watched}
             />
           ) : (
             <>

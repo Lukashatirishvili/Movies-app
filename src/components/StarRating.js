@@ -1,6 +1,51 @@
 import { useState } from "react";
-import PropTypes from "prop-types";
+import { useMovieContext } from "../context/MoviesContext";
 
+export default function StarRating() {
+  const starArr = Array.from({ length: 10 });
+
+  const [tempRating, setTempRating] = useState(0);
+  const { userRating } = useMovieContext();
+
+  return (
+    <div className="ratingSection">
+      <div className="starSection" onMouseOut={() => setTempRating(0)}>
+        {starArr.map((star, i) => (
+          <Star
+            full={tempRating ? tempRating >= i + 1 : userRating >= i + 1}
+            setTempRating={setTempRating}
+            i={i}
+            key={i}
+          />
+        ))}
+      </div>
+      <div className="message">
+        <span>{tempRating ? tempRating : userRating}</span>
+      </div>
+    </div>
+  );
+}
+
+function Star({ i, setTempRating, full }) {
+  const { handleUserRating } = useMovieContext();
+  return (
+    <div>
+      <span
+        onClick={() => handleUserRating(i + 1)}
+        className="star"
+        onMouseOver={() => setTempRating(i + 1)}
+      >
+        {full ? (
+          <ion-icon style={{ color: "#6741d9" }} name="star"></ion-icon>
+        ) : (
+          <ion-icon style={{ color: "grey" }} name="star-outline"></ion-icon>
+        )}
+      </span>
+    </div>
+  );
+}
+
+/*
 StarRating.propTypes = {
   maxRating: PropTypes.number,
   defaultRating: PropTypes.number,
@@ -27,15 +72,16 @@ export default function StarRating({
   size = 48,
   messages = [],
   defaultRating = 0,
-  onSetRating,
   colorArr = [],
 }) {
   const [rating, setRating] = useState(defaultRating ? defaultRating : 0);
   const [tempRating, setTempRating] = useState(0);
 
+  const { handleUserRating } = useMovieContext();
+
   function handleRating(rating) {
     setRating(rating);
-    if (onSetRating) onSetRating(rating);
+    handleUserRating(rating);
   }
 
   const textStyle = {
@@ -126,3 +172,4 @@ function Star({
     </span>
   );
 }
+*/

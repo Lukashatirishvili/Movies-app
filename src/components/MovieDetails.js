@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { useKey } from "../useKey";
 import Loader from "./Loader";
-import StarRating from "../StarRating";
+import StarRating from "./StarRating";
+import { useMovieContext } from "../context/MoviesContext";
 
 const KEY = "33c39069";
 
-export default function MovieDetails({
-  selectedId,
-  onCloseMovie,
-  onAddWatched,
-  watched,
-}) {
-  const [movie, setMovie] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [userRating, setUserRating] = useState("");
+export default function MovieDetails() {
+  const { movie, watched, selectedID, isLoading, userRating, dispatch } =
+    useMovieContext();
 
   const countRef = useRef(0);
 
@@ -21,11 +15,33 @@ export default function MovieDetails({
     if (userRating) countRef.current = countRef.current + 1;
   }, [userRating]);
 
-  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedID);
 
   const watchedUserRating = watched.find(
-    (movie) => movie.imdbID === selectedId
+    (movie) => movie.imdbID === selectedID
   )?.userRating;
+
+  useEffect(() => {
+    async function getSelectedMovie() {
+      dispatch({ type: "fetchingData" });
+      try {
+        const res = await fetch(
+          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`
+        );
+
+        if (!res.ok) throw new Error("There is some problem to fetch data");
+        const data = await res.json();
+
+        dispatch({
+          type: "recieved_SelectedMovie",
+          payload: data || [],
+        });
+      } catch (err) {
+        dispatch({ type: "error", payload: err });
+      }
+    }
+    getSelectedMovie();
+  }, [selectedID, dispatch]);
 
   const {
     Title: title,
@@ -40,58 +56,14 @@ export default function MovieDetails({
     Genre: genre,
   } = movie;
 
-  function handleAdd() {
-    const newWatchedMovie = {
-      imdbID: selectedId,
-      title,
-      year,
-      poster,
-      imdbRating: Number(imdbRating),
-      runtime: Number(runtime.split(" ").at(0)),
-      userRating,
-      countRatingDecisions: countRef.current,
-    };
-
-    onAddWatched(newWatchedMovie);
-    onCloseMovie();
-  }
-
-  useKey("escape", onCloseMovie);
-
-  useEffect(
-    function () {
-      async function getMovieDetails() {
-        setLoading(true);
-        const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`
-        );
-
-        const data = await res.json();
-        setMovie(data);
-        setLoading(false);
-      }
-      getMovieDetails();
-    },
-    [selectedId]
-  );
-
-  useEffect(() => {
-    if (!title) return;
-    document.title = `Movie | ${title}`;
-
-    return () => (document.title = "usePopcorn");
-  }, [title]);
-
   return (
     <div className="details">
-      {loading ? (
+      {isLoading ? (
         <Loader />
       ) : (
         <>
           <header>
-            <button className="btn-back" onClick={onCloseMovie}>
-              &larr;
-            </button>
+            <button className="btn-back">&larr;</button>
             <img src={poster} alt={`poster of ${movie} movie`} />
             <div className="details-overview">
               <h2>{title}</h2>
@@ -108,24 +80,23 @@ export default function MovieDetails({
 
           <section>
             <div className="rating">
-              {!isWatched ? (
+              <StarRating />
+              {userRating > 0 && (
                 <>
-                  <StarRating
-                    maxRating={10}
-                    size={24}
-                    onSetRating={setUserRating}
-                  />
-                  {userRating > 0 && (
-                    <button className="btn-add" onClick={handleAdd}>
-                      + Add to list
-                    </button>
+                  <button className="btn-add">+ Add to list</button>
+                </>
+              )}
+              {/* {!isWatched ? (
+                <>
+                  <StarRating maxRating={10} size={24} />
+                  {
                   )}
                 </>
               ) : (
                 <p>
                   You rated with movie {watchedUserRating} <span>⭐</span>
                 </p>
-              )}
+              )} */}
             </div>
             <p>
               <em>{plot}</em>
