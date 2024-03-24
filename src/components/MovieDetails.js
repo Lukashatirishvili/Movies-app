@@ -24,7 +24,7 @@ export default function MovieDetails() {
       dispatch({ type: "fetchingData" });
       try {
         const res = await fetch(
-          `http://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`
+          `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedID}`
         );
 
         if (!res.ok) throw new Error("There is some problem to fetch data");
