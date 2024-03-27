@@ -12,7 +12,7 @@ const MoviesContext = createContext();
 const initialState = {
   movies: [],
   movie: {},
-  watched: [],
+  watched: JSON.parse(localStorage.getItem("watched")) || [],
   isLoading: false,
   error: "",
   query: "",
@@ -26,8 +26,6 @@ function reducer(state, action) {
   switch (action.type) {
     case "dataRecieved":
       return { ...state, movies: action.payload, isLoading: false };
-    case "getItemsFrom_localStorage":
-      return { ...state, watched: action.payload };
     case "recieved_SelectedMovie":
       return { ...state, movie: action.payload, isLoading: false };
     case "fetchingData":
@@ -68,6 +66,11 @@ function MovieProvider({ children }) {
 
   const inputEl = useRef(null);
 
+  // set watched movies to localStorage
+  useEffect(() => {
+    localStorage.setItem("watched", JSON.stringify(watched));
+  }, [watched]);
+
   // Side effects
   useKey("keydown", "enter", () => {
     if (document.activeElement === inputEl.current) return;
@@ -81,17 +84,6 @@ function MovieProvider({ children }) {
 
     dispatch({ type: "keydown_Escape" });
   });
-  // get watched movies from localstorage
-  useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("watched"));
-    if (data) dispatch({ type: "getItemsFrom_localStorage", payload: data });
-  }, []);
-
-  // set watched movies to localStorage
-  useEffect(() => {
-    if (watched.length < 1) return;
-    localStorage.setItem("watched", JSON.stringify(watched));
-  }, [watched]);
 
   //   Recieve data when input changes
   useEffect(() => {
